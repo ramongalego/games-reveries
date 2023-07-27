@@ -1,20 +1,16 @@
-import { useState } from 'react';
 import { Button, Typography } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import CustomModal from '../../components/CustomModal';
 import AddReviewForms from './AddReviewForms';
+import useModal from '../../hooks/useModal';
 
 const AddReview = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const handleOpenModal = () => setIsModalOpen(true);
-
-  const handleCloseModal = () => setIsModalOpen(false);
+  const { isModalOpen, handleOpenModal, handleCloseModal } = useModal();
 
   return (
     <>
       <Typography variant='h3' gutterBottom textAlign='center'>
-        Add Your Game Reverie
+        Add Your Review
       </Typography>
       <Button
         size='large'

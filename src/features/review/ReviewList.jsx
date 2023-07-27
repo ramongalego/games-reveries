@@ -3,9 +3,9 @@ import { Box } from '@mui/material';
 import ReviewItem from './ReviewItem';
 
 const ReviewList = () => {
-  const reveries = useSelector(state => state.reviews);
+  const reviews = useSelector(state => state.reveries.reviews);
 
-  console.log(reveries);
+  console.log(reviews);
 
   return (
     <Box
@@ -16,8 +16,8 @@ const ReviewList = () => {
         marginTop: '2rem',
       }}
     >
-      {reveries.map(reverie => (
-        <ReviewItem key={reverie.title} reverie={reverie} />
+      {reviews.map(reverie => (
+        <ReviewItem key={reverie.id} reverie={reverie} />
       ))}
     </Box>
   );

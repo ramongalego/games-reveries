@@ -3,6 +3,6 @@ import reviewReducer from '../features/review/ReviewSlice';
 
 export const store = configureStore({
   reducer: {
-    reviews: reviewReducer,
+    reveries: reviewReducer,
   },
 });

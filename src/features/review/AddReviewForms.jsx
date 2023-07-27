@@ -1,6 +1,6 @@
-import { useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { addReview } from './ReviewSlice';
+import { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { addReview, editReview } from './ReviewSlice';
 import {
   Box,
   FormControl,
@@ -10,9 +10,22 @@ import {
   MenuItem,
   Button,
 } from '@mui/material';
+import { platformOptions } from '../../constants/platformOptions';
 
-const AddReviewForms = ({ onClose }) => {
+const AddReviewForms = ({ onClose, editMode }) => {
   const dispatch = useDispatch();
+  const reviews = useSelector(state => state.reveries.reviews);
+  const selectedReviewId = useSelector(state => state.reveries.selectedReview);
+
+  useEffect(() => {
+    if (editMode) {
+      const selectedReview = reviews.find(
+        review => review.id === selectedReviewId,
+      );
+
+      setFormState(selectedReview);
+    }
+  }, [selectedReviewId, reviews, editMode]);
 
   const [formState, setFormState] = useState({
     title: '',
@@ -29,7 +42,17 @@ const AddReviewForms = ({ onClose }) => {
 
   const handleSubmit = e => {
     e.preventDefault();
-    dispatch(addReview(formState));
+
+    if (editMode) {
+      dispatch(
+        editReview({ reviewId: selectedReviewId, updatedReview: formState }),
+      );
+    } else {
+      dispatch(
+        addReview({ ...formState, id: Math.floor(Math.random() * 100) }),
+      );
+    }
+
     onClose();
   };
 
@@ -60,9 +83,11 @@ const AddReviewForms = ({ onClose }) => {
             name='platform'
             value={formState.platform}
           >
-            <MenuItem value='PS5'>PS5</MenuItem>
-            <MenuItem value='Switch'>Switch</MenuItem>
-            <MenuItem value='Steam'>Steam</MenuItem>
+            {platformOptions.map(platform => (
+              <MenuItem key={platform.value} value={platform.value}>
+                {platform.label}
+              </MenuItem>
+            ))}
           </Select>
         </FormControl>
 
@@ -94,7 +119,7 @@ const AddReviewForms = ({ onClose }) => {
         type='submit'
         style={{ marginTop: '2rem' }}
       >
-        Add Reverie
+        {editMode ? 'Save Changes' : 'Add Review'}
       </Button>
     </form>
   );
