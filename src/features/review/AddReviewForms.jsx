@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import * as yup from 'yup';
+
 import {
   Box,
   FormControl,
@@ -16,15 +16,7 @@ import {
 import ErrorMessage from '../../components/ErrorMessage';
 import { addReview, editReview } from './ReviewSlice';
 import { platformOptions } from '../../constants/platformOptions';
-
-const schema = yup
-  .object({
-    title: yup.string().required(),
-    platform: yup.string().required(),
-    rating: yup.number().positive().integer().min(0).max(10).required(),
-    review: yup.string().required(),
-  })
-  .required();
+import { reviewFormSchema } from '../../constants/reviewFormSchema';
 
 const AddReviewForms = ({ onClose, editMode }) => {
   const dispatch = useDispatch();
@@ -38,7 +30,7 @@ const AddReviewForms = ({ onClose, editMode }) => {
     setValue,
     formState: { errors },
   } = useForm({
-    resolver: yupResolver(schema),
+    resolver: yupResolver(reviewFormSchema),
   });
 
   useEffect(() => {
