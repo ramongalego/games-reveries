@@ -14,3 +14,11 @@ body {
 .review-system {
   font-size: 0.9rem;
 }
+
+.error-message {
+  color: #f44336;
+}
+
+.error-message:first-letter {
+  text-transform: capitalize;
+}

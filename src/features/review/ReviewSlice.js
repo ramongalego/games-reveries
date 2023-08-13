@@ -34,8 +34,6 @@ export const reviewSlice = createSlice({
     removeReview: (state, action) => {
       const { reviewId } = action.payload;
 
-      console.log(reviewId);
-
       state.reviews = state.reviews.filter(review => review.id !== reviewId);
     },
   },
