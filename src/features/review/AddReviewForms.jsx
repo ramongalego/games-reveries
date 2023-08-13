@@ -1,6 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { addReview, editReview } from './ReviewSlice';
+import { useForm, Controller } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from 'yup';
 import {
   Box,
   FormControl,
@@ -10,12 +12,34 @@ import {
   MenuItem,
   Button,
 } from '@mui/material';
+
+import ErrorMessage from '../../components/ErrorMessage';
+import { addReview, editReview } from './ReviewSlice';
 import { platformOptions } from '../../constants/platformOptions';
+
+const schema = yup
+  .object({
+    title: yup.string().required(),
+    platform: yup.string().required(),
+    rating: yup.number().positive().integer().min(0).max(10).required(),
+    review: yup.string().required(),
+  })
+  .required();
 
 const AddReviewForms = ({ onClose, editMode }) => {
   const dispatch = useDispatch();
-  const reviews = useSelector(state => state.reveries.reviews);
-  const selectedReviewId = useSelector(state => state.reveries.selectedReview);
+  const reviews = useSelector(state => state.reveries?.reviews);
+  const selectedReviewId = useSelector(state => state.reveries?.selectedReview);
+
+  const {
+    register,
+    handleSubmit,
+    control,
+    setValue,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(schema),
+  });
 
   useEffect(() => {
     if (editMode) {
@@ -23,41 +47,24 @@ const AddReviewForms = ({ onClose, editMode }) => {
         review => review.id === selectedReviewId,
       );
 
-      setFormState(selectedReview);
+      for (const key in selectedReview) {
+        setValue(key, selectedReview[key]);
+      }
     }
-  }, [selectedReviewId, reviews, editMode]);
+  }, [selectedReviewId, reviews, editMode, setValue]);
 
-  const [formState, setFormState] = useState({
-    title: '',
-    review: '',
-    rating: 0,
-    platform: '',
-  });
-
-  const handleChange = e => {
-    const { name, value } = e.target;
-
-    setFormState(prevState => ({ ...prevState, [name]: value }));
-  };
-
-  const handleSubmit = e => {
-    e.preventDefault();
-
+  const onSubmit = data => {
     if (editMode) {
-      dispatch(
-        editReview({ reviewId: selectedReviewId, updatedReview: formState }),
-      );
+      dispatch(editReview({ reviewId: selectedReviewId, updatedReview: data }));
     } else {
-      dispatch(
-        addReview({ ...formState, id: Math.floor(Math.random() * 100) }),
-      );
+      dispatch(addReview({ ...data, id: crypto.randomUUID() }));
     }
 
     onClose();
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit(onSubmit)}>
       <Box
         sx={{
           display: 'flex',
@@ -65,53 +72,59 @@ const AddReviewForms = ({ onClose, editMode }) => {
           marginBottom: '2rem',
         }}
       >
-        <TextField
-          label='Game Title'
-          variant='outlined'
-          required
-          onChange={handleChange}
-          name='title'
-          value={formState.title}
-        />
+        <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+          <TextField
+            label='Game Title'
+            variant='outlined'
+            {...register('title')}
+          />
+          <ErrorMessage message={errors.title?.message} />
+        </Box>
 
         <FormControl sx={{ minWidth: 200 }}>
-          <InputLabel id='select-label'>Platform *</InputLabel>
-          <Select
-            labelId='select-label'
-            label='Platform *'
-            onChange={handleChange}
+          <InputLabel id='select-label'>Platform</InputLabel>
+          <Controller
             name='platform'
-            value={formState.platform}
-          >
-            {platformOptions.map(platform => (
-              <MenuItem key={platform.value} value={platform.value}>
-                {platform.label}
-              </MenuItem>
-            ))}
-          </Select>
+            control={control}
+            rules={{ required: true }}
+            defaultValue=''
+            render={({ field }) => (
+              <Select labelId='select-label' label='Platform *' {...field}>
+                {platformOptions.map(platform => (
+                  <MenuItem key={platform.value} value={platform.value}>
+                    {platform.label}
+                  </MenuItem>
+                ))}
+              </Select>
+            )}
+          />
+          <ErrorMessage message={errors.platform?.message} />
         </FormControl>
 
-        <TextField
-          label='Rating'
-          variant='outlined'
-          type='number'
-          required
-          onChange={handleChange}
-          name='rating'
-          value={formState.rating}
-        />
+        <Box
+          sx={{ display: 'flex', flexDirection: 'column', maxWidth: '195px' }}
+        >
+          <TextField
+            label='Rating'
+            variant='outlined'
+            type='number'
+            defaultValue={0}
+            {...register('rating')}
+          />
+          <ErrorMessage message={errors.rating?.message} />
+        </Box>
       </Box>
 
-      <TextField
-        label='Game Review'
-        variant='outlined'
-        fullWidth
-        multiline
-        required
-        onChange={handleChange}
-        name='review'
-        value={formState.review}
-      />
+      <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+        <TextField
+          label='Game Review'
+          variant='outlined'
+          fullWidth
+          multiline
+          {...register('review')}
+        />
+        <ErrorMessage message={errors.review?.message} />
+      </Box>
 
       <Button
         size='medium'
