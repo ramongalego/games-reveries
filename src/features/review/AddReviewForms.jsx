@@ -1,8 +1,8 @@
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useForm, Controller } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
 
+import { yupResolver } from '@hookform/resolvers/yup';
 import {
   Box,
   FormControl,
@@ -14,9 +14,9 @@ import {
 } from '@mui/material';
 
 import ErrorMessage from '../../components/ErrorMessage';
-import { addReview, editReview } from './ReviewSlice';
 import { platformOptions } from '../../constants/platformOptions';
 import { reviewFormSchema } from '../../constants/reviewFormSchema';
+import { addReview, editReview } from './ReviewSlice';
 
 const AddReviewForms = ({ onClose, editMode }) => {
   const dispatch = useDispatch();

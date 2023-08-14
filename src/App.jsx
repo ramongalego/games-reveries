@@ -1,5 +1,6 @@
-import Home from './pages/Home';
 import { CssBaseline } from '@mui/material';
+
+import Home from './pages/Home';
 
 const App = () => {
   return (
